@@ -1,4 +1,4 @@
-const { GraphQLObjectType, GraphQLSchema } = require(`graphql`)
+const { GraphQLObjectType, GraphQLSchema } = require(`gatsby/graphql`)
 const {
   visitSchema,
   VisitSchemaKind,

@@ -22,8 +22,6 @@
     "@babel/preset-react": "7.0.0-beta.51",
     "@babel/runtime": "7.0.0-beta.51",
     "@babel/traverse": "7.0.0-beta.51",
-    "apollo-link": "^1.2.2",
-    "apollo-link-http": "^1.5.4",
     "async": "^2.1.2",
     "autoprefixer": "^7.1.2",
     "babel-core": "7.0.0-bridge.0",

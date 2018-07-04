@@ -1,19 +1,8 @@
 /* @flow */
 const _ = require(`lodash`)
 const { GraphQLSchema, GraphQLObjectType } = require(`graphql`)
-const {
-  makeRemoteExecutableSchema,
-  mergeSchemas,
-  transformSchema,
-  introspectSchema,
-} = require(`graphql-tools`)
-import { createHttpLink } from "apollo-link-http"
-import fetch from "node-fetch"
+const { mergeSchemas } = require(`graphql-tools`)
 
-const {
-  NamespaceUnderFieldTransform,
-  StripNonQueryTransform,
-} = require(`./transforms`)
 const buildNodeTypes = require(`./build-node-types`)
 const buildNodeConnections = require(`./build-node-connections`)
 const { store } = require(`../redux`)
@@ -29,22 +18,7 @@ module.exports = async () => {
   invariant(!_.isEmpty(nodes), `There are no available GQL nodes`)
   invariant(!_.isEmpty(connections), `There are no available GQL connections`)
 
-  const link = createHttpLink({
-    uri: `https://api.graphcms.com/simple/v1/swapi`,
-    fetch,
-  })
-  const remoteSchema = makeRemoteExecutableSchema({
-    schema: await introspectSchema(link),
-    link,
-  })
-
-  const transformedSchema = transformSchema(remoteSchema, [
-    new StripNonQueryTransform(),
-    new NamespaceUnderFieldTransform({
-      typeName: `SWAPI`,
-      fieldName: `swapi`,
-    }),
-  ])
+  const thirdPartySchemas = store.getState().thirdPartySchemas || []
 
   const gatsbySchema = new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -53,8 +27,12 @@ module.exports = async () => {
     }),
   })
 
+  thirdPartySchemas.forEach(schema => {
+    console.log(typeof schema, schema instanceof GraphQLSchema)
+  })
+
   const schema = mergeSchemas({
-    schemas: [gatsbySchema, transformedSchema],
+    schemas: [gatsbySchema, ...thirdPartySchemas],
   })
 
   store.dispatch({
