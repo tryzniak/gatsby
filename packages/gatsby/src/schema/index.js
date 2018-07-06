@@ -27,10 +27,6 @@ module.exports = async () => {
     }),
   })
 
-  thirdPartySchemas.forEach(schema => {
-    console.log(typeof schema, schema instanceof GraphQLSchema)
-  })
-
   const schema = mergeSchemas({
     schemas: [gatsbySchema, ...thirdPartySchemas],
   })

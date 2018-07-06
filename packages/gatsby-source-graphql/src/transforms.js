@@ -16,16 +16,23 @@ class NamespaceUnderFieldTransform {
 
   transformSchema(schema) {
     const query = schema.getQueryType()
+    let newQuery
     const nestedType = new GraphQLObjectType({
       name: this.typeName,
       fields: () =>
         fieldMapToFieldConfigMap(
           query.getFields(),
-          createResolveType(typeName => schema.getType(typeName)),
+          createResolveType(typeName => {
+            if (typeName === query.name) {
+              return newQuery
+            } else {
+              return schema.getType(typeName)
+            }
+          }),
           true
         ),
     })
-    const newQuery = new GraphQLObjectType({
+    newQuery = new GraphQLObjectType({
       name: query.name,
       fields: {
         [this.fieldName]: {
@@ -36,8 +43,14 @@ class NamespaceUnderFieldTransform {
         },
       },
     })
+    const typeMap = schema.getTypeMap()
+    const allTypes = Object.keys(typeMap)
+      .filter(name => name !== query.name)
+      .map(key => typeMap[key])
+
     return new GraphQLSchema({
       query: newQuery,
+      types: allTypes,
     })
   }
 }
