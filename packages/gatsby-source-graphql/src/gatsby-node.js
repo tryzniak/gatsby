@@ -7,7 +7,7 @@ const {
 } = require(`graphql-tools`)
 const { createHttpLink } = require(`apollo-link-http`)
 const fetch = require(`node-fetch`)
-
+const invariant = require(`invariant`)
 const {
   NamespaceUnderFieldTransform,
   StripNonQueryTransform,
@@ -24,6 +24,19 @@ exports.sourceNodes = async ({ boundActionCreators, cache }, options) => {
     createLink,
     createSchema,
   } = options
+
+  invariant(
+    typeName && typeName.length > 0,
+    `gatsby-source-graphql requires option \`typeName\` to be specified`
+  )
+  invariant(
+    fieldName && fieldName.length > 0,
+    `gatsby-source-graphql requires option \`fieldName\` to be specified`
+  )
+  invariant(
+    (url && url.length > 0) || createLink,
+    `gatsby-source-graphql requiers either option \`url\` or \`createLink\` callback`
+  )
 
   let link
   if (createLink) {
