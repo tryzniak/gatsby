@@ -1,7 +1,7 @@
 // @flow
 import path from "path"
 const normalize = require(`normalize-path`)
-import glob from "glob"
+import glob from "fast-glob"
 
 import { validate } from "graphql"
 import { IRTransforms } from "relay-compiler"
@@ -87,12 +87,11 @@ class Runner {
   async parseEverything() {
     // FIXME: this should all use gatsby's configuration to determine parsable
     // files (and how to parse them)
-    let files = glob.sync(`${this.fragmentsDir}/**/*.+(t|j)s?(x)`, {
+    console.time('glob')
+    let files = await glob.async([`${this.fragmentsDir}/**/*.+(t|j)s?(x)`,`${this.baseDir}/**/*.+(t|j)s?(x)`], {
       nodir: true,
     })
-    files = files.concat(
-      glob.sync(`${this.baseDir}/**/*.+(t|j)s?(x)`, { nodir: true })
-    )
+    console.timeEnd('glob')
     files = files.filter(d => !d.match(/\.d\.ts$/))
     files = files.map(normalize)
 
